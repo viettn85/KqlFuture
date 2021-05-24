@@ -1,0 +1,6 @@
+logs/*.log
+env
+env/*
+.DS_Store
+cookies.txt
+data/*
