@@ -49,8 +49,11 @@ def getTransactionsByStock(stock, date, time=""):
                 '_': "1602053384943"
             }
     # URL = "https://plus24.mbs.com.vn/HO.ashx"
-    data = requests.get(url=os.getenv('contractUrl'), params=PARAMS).text
+    response = requests.get(url=os.getenv('contractUrl'), params=PARAMS)
+    print(response.request.url)
+    data = response.text
     df = clean(data)
+    print(df.head())
     if len(df) > 0:
         save(df, stock, date)
     else:
@@ -90,4 +93,3 @@ if __name__ == '__main__':
         getTransactions(os.getenv('contractStock'), sys.argv[1])
     if len(sys.argv) == 3:
         getTransactions(os.getenv('contractStock'), sys.argv[1], sys.argv[2])
-

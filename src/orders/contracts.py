@@ -73,6 +73,7 @@ def getPrice(contract):
         return ()
 
 def order(orderType, orderVolume, orderPrice, ordtype, stopOrderType, stopPrice):
+    logger.info("Test")
     params = generateParams(orderType, orderVolume, orderPrice, ordtype, stopOrderType, stopPrice)
     headers = {'Content-type': 'application/x-www-form-urlencoded; charset=utf-8', 'cookie': COOKIE}
     r = requests.post(os.getenv('orderUrl'), params=params, data=None, headers=headers)
@@ -277,5 +278,8 @@ if __name__ == '__main__':
         if sys.argv[4] == 'tdown':
             stopOrderType = 6
         if (side != "") & (stopOrderType != -1):
-            logger.info(side, stopOrderType)
-            order(side, sys.argv[2], price, 1, stopOrderType, sys.argv[5])
+            logger.info(side + " " + str(stopOrderType))
+        logger.info(side)
+        logger.info(stopOrderType)
+
+        order(side, sys.argv[2], price, 1, stopOrderType, sys.argv[5])

@@ -22,16 +22,12 @@ then
 elif [ $1 == 'bigboys' ]
 then
     python3 src/bigboys/viewContractTrades.py
-elif [ $1 == 'crawl' ]
+elif [ $1 == 'update' ]
 then
-    if [ $# == 3 ]
-    then
-        python3 src/api/intraday.py $2 $3
-    fi
-    if [ $# == 2 ]
-    then
-        python3 src/api/intraday.py $2
-    fi
+    python3 src/crawler/realtime.py
+elif [ $1 == 'scan' ]
+then
+    python3 src/scan/ducky.py
 elif [ $1 == 'buy' ]
 then
     python3 src/orders/contracts.py $1 $2 $3 $4 $5 # scan buy 2 920
@@ -41,7 +37,7 @@ then
 elif [ $1 == 'cancel' ]
 then
     python3 src/orders/contracts.py $1 $2 # scan cancel 5475036
-elif [ $1 == 'update' ]
+elif [ $1 == 'ducky' ]
 then
-    python3 src/orders/contracts.py $1 $2 $3 $4 $5 # kqlf order 5475036 1 1040 1042
+    python3 src/scan/ducky.py $2 # scan cancel 5475036
 fi
