@@ -40,4 +40,7 @@ then
 elif [ $1 == 'ducky' ]
 then
     python3 src/scan/ducky.py $2 # scan cancel 5475036
+elif [ $1 == 'cashflow' ]
+then
+    python3 src/cashflow/analysis.py $2 # scan cancel 5475036
 fi
