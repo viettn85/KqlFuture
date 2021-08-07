@@ -52,6 +52,10 @@ def isTradingTime():
     currentTime = str(now.strftime("%H:%M"))
     return (now.weekday() < 5) and (currentTime > "09:15") and (currentTime < "15:00")
 
+def isWeekday():
+    now = datetime.now(timezone(tz))
+    return (now.weekday() < 5)
+
 def isATO():
     now = datetime.now(timezone(tz))
     currentTime = str(now.strftime("%H:%M"))

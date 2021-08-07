@@ -28,7 +28,7 @@ logging.config.fileConfig(fname='log.conf', disable_existing_loggers=False)
 logger = logging.getLogger()
 
 def updateStockTransaction(stock):
-    logger.info("Updating {}".format(stock))
+    logger.info("Updating transaction {}".format(stock))
     URL = "https://plus24.mbs.com.vn/HO.ashx?DetailFile={}".format(os.getenv(stock))
     rsGetRquest= requests.get(URL)
     tradingData = json.loads(rsGetRquest.text[10:-2])
@@ -53,12 +53,20 @@ def updateStockTransaction(stock):
 
 def updateTransactions():
     stocks = ['VN30F1M', 'VN30F2M']
-    # stocks = ['VN30F1M']
     for stock in stocks:
         updateStockTransaction(stock)
 
+def updateRealtimeTransactions():
+    if isWeekday():
+        currentTime = getCurrentTime()
+        if ((currentTime >= '09:00') and (currentTime <= '11:30')) or ((currentTime >= '13:00') and (currentTime <= '14:50')):
+            updateTransactions()
+
 if __name__ == "__main__":
-    schedule.every(15).seconds.do(updateTransactions)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    if sys.argv[1] == 'history':
+        updateTransactions()
+    if sys.argv[1] == 'realtime':
+        schedule.every(15).seconds.do(updateRealtimeTransactions)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)

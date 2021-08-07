@@ -13,6 +13,9 @@ import logging.config
 import math
 from utils import *
 import json
+import schedule
+import time
+
 np.seterr(divide='ignore', invalid='ignore')
 load_dotenv(dotenv_path='future.env')
 
@@ -150,30 +153,43 @@ def findPatterns(df, i, subDf, position):
         patterns.append("ShouldExitShort")
     return patterns
 
-def scan():
-    stocks = ['VN30F1M', 'VN30F2M']
+def scan(stocks, bigTimeframe, smallTimeframe):
     positions = pd.read_csv(data_location + os.getenv('positions'))
     message = ""
     patternStocks = []
     foundPatterns = []
     rowIndex = 0
+    newPositions = []
     for stock in stocks:
         logger.info("Scanning {}".format(stock))
-        df = pd.read_csv("{}{}_{}.csv".format(intraday, '15', stock))
-        subDf = pd.read_csv("{}{}_{}.csv".format(intraday, '5', stock))
+        df = pd.read_csv("{}{}_{}.csv".format(intraday, bigTimeframe, stock))
+        subDf = pd.read_csv("{}{}_{}.csv".format(intraday, smallTimeframe, stock))
         getIndicators(df)
         getIndicators(subDf)
         position = positions[positions.Stock==stock].to_dict(orient='records')[0]
         patterns = findPatterns(df, rowIndex, subDf, position)
+        newPositions.append(position)
         if len(patterns) > 0:
             logger.info(patterns)
             patternStocks.append(stock)
             foundPatterns.append(", ".join(patterns))
-
+    positionDf = pd.DataFrame(newPositions)
+    positionDf.to_csv(data_location + os.getenv('positions'), index=None)
     if len(patternStocks) > 0:
         patternDf = pd.DataFrame({"Stock": patternStocks, "Patterns": foundPatterns})
         message = "<H2>{}</H2>\n\n".format(df.iloc[rowIndex].Date)
         sendEmail("PS Pattern Found", message + html_style_basic(patternDf), "html")
+
+def scanPs():
+    if isWeekday():
+        currentTime = getCurrentTime()
+        if ((currentTime >= '09:15') and (currentTime <= '11:30')) or ((currentTime >= '13:00') and (currentTime <= '14:50')):
+            stocks = ['VN30F1M', 'VN30F2M']
+            scan(stocks, '15', '5')
+
+def checkPositions():
+    positions = pd.read_csv(data_location + os.getenv('positions'))
+    print(positions)
 
 def test():
     stocks = ['VN30F1M', 'VN30F2M']
@@ -202,5 +218,10 @@ if __name__ == "__main__":
         logger.info("Test pattern finding")
         test()
     if sys.argv[1] == 'scan':
-        logger.info("Realtime finding")
-        scan()
+        schedule.every(60).seconds.do(scanPs)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    if sys.argv[1] == 'position':
+        checkPositions()
+
