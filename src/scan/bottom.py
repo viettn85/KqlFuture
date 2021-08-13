@@ -34,22 +34,7 @@ timeframes = ['5', '15', '60', 'D']
 msgBottom = 'Bottom'
 msgTop = "Top"
 
-# PDI forming a bottom and NDI forming a top on the uptrend
-def checkBottomOnUptrend(df, rowIndex):
-    row = df.iloc[rowIndex]
-    prow = df.iloc[rowIndex + 1]
-    isADXAbove25 = row.ADX >= 25
-    maxNDI = round(max(list(df.loc[rowIndex:rowIndex+5].NDI)), 0)
-    isNDIOnTop = (row.NDI < maxNDI) and (row.NDI >= 30) and (maxNDI >= round(row.ADX, 0))
-    minPDI = min(list(df.loc[rowIndex:rowIndex+5].PDI))
-    isPDIOnBottom = (row.PDI > minPDI) and (row.PDI < 25) and (row.PDI > prow.PDI)
-    isHistogramIncreased = row.Histogram > prow.Histogram
-    isAboveMA200 = row.Close > row.MA200
-    minStoch = round(min(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
-    isStochOverSold = minStoch <= 25
-    return isADXAbove25 and isNDIOnTop and isPDIOnBottom and isHistogramIncreased and isAboveMA200 and isStochOverSold
-
-# PDI forming a bottom and NDI forming a top when break down MA200
+# PDI forming a bottom and NDI forming a top
 def checkBottom(df, rowIndex):
     row = df.iloc[rowIndex]
     prow = df.iloc[rowIndex + 1]
@@ -62,21 +47,6 @@ def checkBottom(df, rowIndex):
     minStoch = round(min(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
     isStochOverSold = minStoch <= 25
     return isNDIOnTop and isPDIOnBottom and isHistogramIncreased and isStochOverSold
-
-# NDI forming a bottom and PDI forming a top on the uptrend
-def checkTopOnDowntrend(df, rowIndex):
-    row = df.iloc[rowIndex]
-    prow = df.iloc[rowIndex + 1]
-    isADXAbove25 = row.ADX >= 25
-    maxPDI = round(max(list(df.loc[rowIndex:rowIndex+5].PDI)), 0)
-    isNDIOnTop = (row.PDI < maxPDI) and (row.PDI >= 30) and (maxPDI >= round(row.ADX, 0))
-    minNDI = min(list(df.loc[rowIndex:rowIndex+5].NDI))
-    isNDIOnBottom = (row.NDI > minNDI) and (row.NDI < 25) and (row.NDI > prow.NDI)
-    isHistogramDecreased = row.Histogram < prow.Histogram
-    isUnderMA200 = row.Close < row.MA200
-    maxStoch = round(max(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
-    isStochOverBought = maxStoch >= 75
-    return isADXAbove25 and isNDIOnTop and isNDIOnBottom and isHistogramDecreased and isUnderMA200 and isStochOverBought
 
 # PDI forming a bottom and NDI forming a top when above MA200
 def checkTop(df, rowIndex):
@@ -96,34 +66,38 @@ def checkBottomOnCorrection(df, rowIndex):
     row = df.iloc[rowIndex]
     prow = df.iloc[rowIndex + 1]
     minADX = round(min(list(df.loc[rowIndex:rowIndex+5].ADX)), 0)
-    isADXOnBottom = (row.ADX > prow.ADX) and (row.ADX < 25)
-    isCrossDIs = (prow.PDI <= prow.NDI) and (row.PDI >= row.NDI)
+    isADXOnBottom = (row.ADX > prow.ADX) and (row.ADX < 25) and (row.ADX > minADX) and (df.iloc[rowIndex + 5].ADX > minADX)
     isPDIIncreased = (row.PDI > prow.PDI) and (row.PDI >= row.NDI)
     isHistogramIncreased = row.Histogram > prow.Histogram
     isMACDNegative = row.MACD_SIGNAL < 0
     isAboveMA200 = row.Close > row.MA200
     minStoch = round(min(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
     isStochOverSold = minStoch <= 25
+    if isADXOnBottom and isPDIIncreased:
+        print(df.iloc[rowIndex].Date, "ADX Bottom and Increasing")
     return isADXOnBottom and isPDIIncreased and isHistogramIncreased and isAboveMA200 and isStochOverSold and isMACDNegative
 
-def checkBottomOnCorrectionV2(df, rowIndex):
+# ADX forming a bottom while PDI increasing and NDI decreasing
+def checkTopOnCorrection(df, rowIndex):
     row = df.iloc[rowIndex]
     prow = df.iloc[rowIndex + 1]
     minADX = round(min(list(df.loc[rowIndex:rowIndex+5].ADX)), 0)
-    isADXOnBottom = (row.ADX > prow.ADX) and (row.ADX < 25)
-    isCrossDIs = (prow.PDI <= prow.NDI) and (row.PDI >= row.NDI)
-    isPDIIncreased = (row.PDI > prow.PDI) and (row.PDI >= row.NDI)
-    isHistogramIncreased = row.Histogram > prow.Histogram
-    isAboveMA200 = row.Close > row.MA200
-    minStoch = round(min(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
-    isStochOverSold = minStoch <= 25
-    return isADXOnBottom and isPDIIncreased and isHistogramIncreased and isAboveMA200 and isStochOverSold
+    isADXOnBottom = (row.ADX > prow.ADX) and (row.ADX < 25) and (row.ADX > minADX) and (df.iloc[rowIndex + 5].ADX > minADX)
+    isNDIIncreased = (row.NDI > prow.NDI) and (row.NDI >= row.PDI)
+    isHistogramDecreased = row.Histogram < prow.Histogram
+    isMACDPossitive = row.MACD_SIGNAL > 0
+    isBelowMA200 = row.Close < row.MA200
+    maxStoch = round(max(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
+    isStochOverBought = maxStoch <= 75
+    if isADXOnBottom and isNDIIncreased:
+        print(df.iloc[rowIndex].Date, "ADX Bottom and Decreasing")
+    return isADXOnBottom and isNDIIncreased and isHistogramDecreased and isBelowMA200 and isStochOverBought and isMACDPossitive
 
 def filterStocks(stocks, rowIndex):
     topStocks = []
     bottomStocks = []
     bottomCorrectionStocks = []
-    bottomCorrectionStocksV2 = []
+    topCorrectionStocks = []
     date = ""
     for stock in stocks:
         logger.info("Scanning {}".format(stock))
@@ -135,24 +109,28 @@ def filterStocks(stocks, rowIndex):
             topStocks.append(stock)
         if checkBottom(df, rowIndex):
             bottomStocks.append(stock)
+        if checkTopOnCorrection(df, rowIndex):
+            topCorrectionStocks.append(stock)
         if checkBottomOnCorrection(df, rowIndex):
             bottomCorrectionStocks.append(stock)
-        if checkBottomOnCorrectionV2(df, rowIndex):
-            bottomCorrectionStocksV2.append(stock)
-    return (date, topStocks, bottomStocks, bottomCorrectionStocks, bottomCorrectionStocksV2)
+    return (date, topStocks, bottomStocks, topCorrectionStocks, bottomCorrectionStocks)
 
 def scan(stocks, rowIndex):
-    (date, topStocks, bottomStocks, bottomCorrectionStocks, bottomCorrectionStocksV2) = filterStocks(stocks, rowIndex)
+    (date, topStocks, bottomStocks, topCorrectionStocks, bottomCorrectionStocks) = filterStocks(stocks, rowIndex)
     print("Scanning on {}".format(date))
+    if len(topStocks) > 0:
+        print(msgTop)
+        print(",".join(topStocks))
     if len(bottomStocks) > 0:
         print(msgBottom)
         print(",".join(bottomStocks))
+    if len(topCorrectionStocks) > 0:
+        print("Top correction")
+        print(",".join(topCorrectionStocks))
     if len(bottomCorrectionStocks) > 0:
         print("Bottom correction")
         print(",".join(bottomCorrectionStocks))
-    if len(bottomCorrectionStocksV2) > 0:
-        print("Bottom correction V2 (MACD SIGNAL can be above 0)")
-        print(",".join(bottomCorrectionStocksV2))
+
 
 def reportFoundStocks(stocks, rowIndex):
     (date, bottomOnUptrendStocks, bottomStocks, bottomCorrectionStocks, bottomCorrectionStocksV2) = filterStocks(stocks, rowIndex)
@@ -181,10 +159,10 @@ def checkStock(stock):
                 patterns.append(msgTop)
             if checkBottom(df, rowIndex):
                 patterns.append(msgBottom)
+            if checkTopOnCorrection(df, rowIndex):
+                patterns.append("Top correction")
             if checkBottomOnCorrection(df, rowIndex):
                 patterns.append("Bottom correction")
-            if checkBottomOnCorrectionV2(df, rowIndex):
-                patterns.append("Bottom correction V2 (MACD SIGNAL can be above 0)")
             if len(patterns) > 0:
                 print(df.iloc[rowIndex].Date, ",".join(patterns))
 
