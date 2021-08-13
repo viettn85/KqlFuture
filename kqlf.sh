@@ -16,15 +16,10 @@ then
 elif [ $1 == 'positions' ]
 then
     python3 src/orders/contracts.py $1
-elif [ $1 == 'intraday' ]
-then
-    python3 src/api/future.py
-elif [ $1 == 'bigboys' ]
-then
-    python3 src/bigboys/viewContractTrades.py
+
 elif [ $1 == 'update' ]
 then
-    python3 src/crawler/realtime.py
+    python3 src/crawler/intraday.py $2
 elif [ $1 == 'scan' ]
 then
     python3 src/scan/ducky.py
@@ -43,4 +38,7 @@ then
 elif [ $1 == 'cashflow' ]
 then
     python3 src/cashflow/analysis.py $2 # scan cancel 5475036
+elif [ $1 == 'shoot' ]
+then
+    python3 src/chart/ducky.py # kqlf shoot
 fi
