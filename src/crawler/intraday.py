@@ -32,6 +32,7 @@ def updatePriceAndVolume(resolution):
     toDate = (datetime.now(timezone(tz)) + relativedelta(days=1)).strftime(date_format)
     startTime = getEpoch(fromDate )
     endTime = getEpoch(toDate)
+    endTime = 1628838646
     stocks = ['VN30F1M', 'VN30F2M', 'VN30', 'VNINDEX']
     for stock in stocks: 
         logger.info('Intraday {} for {}'.format(resolution, stock))
@@ -51,6 +52,7 @@ def updatePriceAndVolume(resolution):
         newDf.drop('Close_Shift', axis=1, inplace=True)
         newDf[['Close', 'Open', 'High', 'Low']] = round(newDf[['Close', 'Open', 'High', 'Low']], 2)
         newDf.to_csv("{}{}_{}.csv".format(intraday, resolution, stock), index=None)
+
 
 def updateAll():
     if isWeekday():
@@ -76,6 +78,7 @@ def crawlRecentIntraday():
     updatePriceAndVolume('5')
 
 if __name__ == "__main__":
+    
     if sys.argv[1] == 'history':
         crawlRecentIntraday()
     if sys.argv[1] == 'realtime':

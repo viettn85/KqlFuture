@@ -90,7 +90,7 @@ def checkTopOnCorrection(df, rowIndex):
     maxStoch = round(max(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
     isStochOverBought = maxStoch <= 75
     if isADXOnBottom and isNDIIncreased:
-        print(df.iloc[rowIndex].Date, "ADX Bottom and Decreasing")
+        print(df.iloc[rowIndex].Date, "ADX Top and Decreasing")
     return isADXOnBottom and isNDIIncreased and isHistogramDecreased and isBelowMA200 and isStochOverBought and isMACDPossitive
 
 def filterStocks(stocks, rowIndex):
@@ -100,7 +100,7 @@ def filterStocks(stocks, rowIndex):
     topCorrectionStocks = []
     date = ""
     for stock in stocks:
-        logger.info("Scanning {}".format(stock))
+        # logger.info("Scanning {}".format(stock))
         df = pd.read_csv("{}{}.csv".format(intraday, stock))
         # subDf = pd.read_csv("{}{}_{}.csv".format(intraday, smallTimeframe, stock))
         date = df.iloc[rowIndex].Date
@@ -187,8 +187,8 @@ if __name__ == "__main__":
     if (len(sys.argv) == 2):
         if(sys.argv[1] == 'history'):
             scanHistoricalStocks(all_stocks)
-        if len(sys.argv[1]) != 'email':
+        elif (sys.argv[1] == "email"):
+            reportFoundStocks(all_stocks, 0)
+        else:
             print("Check stock")
             checkStock(sys.argv[1])
-        if (sys.argv[1] == "email"):
-            reportFoundStocks(all_stocks, 0)

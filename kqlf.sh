@@ -41,4 +41,7 @@ then
 elif [ $1 == 'shoot' ]
 then
     python3 src/chart/ducky.py # kqlf shoot
+elif [ $1 == 'bottom' ]
+then
+    python3 src/scan/bottom.py $2 $3
 fi
