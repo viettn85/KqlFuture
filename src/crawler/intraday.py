@@ -32,7 +32,6 @@ def updatePriceAndVolume(resolution):
     toDate = (datetime.now(timezone(tz)) + relativedelta(days=1)).strftime(date_format)
     startTime = getEpoch(fromDate )
     endTime = getEpoch(toDate)
-    endTime = 1628838646
     stocks = ['VN30F1M', 'VN30F2M', 'VN30', 'VNINDEX']
     for stock in stocks: 
         logger.info('Intraday {} for {}'.format(resolution, stock))
@@ -52,6 +51,23 @@ def updatePriceAndVolume(resolution):
         newDf.drop('Close_Shift', axis=1, inplace=True)
         newDf[['Close', 'Open', 'High', 'Low']] = round(newDf[['Close', 'Open', 'High', 'Low']], 2)
         newDf.to_csv("{}{}_{}.csv".format(intraday, resolution, stock), index=None)
+
+def append(stock):
+    df5 = pd.read_csv("{}{}_{}.csv".format(intraday, '5', 'stock'), index=None).loc[0]
+    lastUpdated = df5.iloc[0].Date # 2021-08-13T14:45:00Z
+    currentDate = lastUpdated[0:11] + "00:00:00Z"
+    currentHour = lastUpdated[0:13] + "00:00Z"
+    df = pd.DataFrame.from_dict(
+        {
+            'Date': [currentDate], 
+            'Close': [df5.iloc[0].Date]
+        })
+    # df15 = pd.read_csv("{}{}_{}.csv".format(intraday, '15', 'stock'), index=None)
+    df60 = pd.read_csv("{}{}_{}.csv".format(intraday, '60', 'stock'), index=None)
+    df60 = df60[df60.Date != currentHour]
+    dfD = pd.read_csv("{}{}_{}.csv".format(intraday, 'D', 'stock'), index=None)
+    dfD = df60[dfD.Date != currentDate]
+
 
 
 def updateAll():
@@ -78,7 +94,6 @@ def crawlRecentIntraday():
     updatePriceAndVolume('5')
 
 if __name__ == "__main__":
-    
     if sys.argv[1] == 'history':
         crawlRecentIntraday()
     if sys.argv[1] == 'realtime':

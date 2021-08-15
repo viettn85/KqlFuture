@@ -33,6 +33,8 @@ timeframes = ['5', '15', '60', 'D']
 
 msgBottom = 'Bottom'
 msgTop = "Top"
+msgUptrendCorrection = "Uptrend Correction"
+msgDowntrendCorrection = "Downtrend Correction"
 
 # PDI forming a bottom and NDI forming a top
 def checkBottom(df, rowIndex):
@@ -46,20 +48,20 @@ def checkBottom(df, rowIndex):
     # isBelowMA200 = row.Close < row.MA200
     minStoch = round(min(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
     isStochOverSold = minStoch <= 25
-    return isNDIOnTop and isPDIOnBottom and isHistogramIncreased and isStochOverSold
+    return isNDIOnTop and isPDIOnBottom and isHistogramIncreased and isStochOverSold and (row.ADX >= 25)
 
-# PDI forming a bottom and NDI forming a top when above MA200
+# PDI forming a bottom and NDI forming a top:
 def checkTop(df, rowIndex):
     row = df.iloc[rowIndex]
     prow = df.iloc[rowIndex + 1]
     maxPDI = round(max(list(df.loc[rowIndex:rowIndex+5].PDI)), 0)
-    isNDIOnTop = (row.PDI < maxPDI) and (row.PDI >= 30) and (maxPDI >= round(row.ADX, 0))
+    isPDIOnTop = (row.PDI < maxPDI) and (row.PDI >= 30) and (maxPDI >= round(row.ADX, 0))
     minNDI = min(list(df.loc[rowIndex:rowIndex+5].NDI))
     isNDIOnBottom = (row.NDI > minNDI) and (row.NDI < 25) and (row.NDI > prow.NDI)
     isHistogramDecreased = row.Histogram < prow.Histogram
     maxStoch = round(max(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
     isStochOverBought = maxStoch >= 75
-    return isNDIOnTop and isNDIOnBottom and isHistogramDecreased and isStochOverBought
+    return isPDIOnTop and isNDIOnBottom and isHistogramDecreased and isStochOverBought and (row.ADX >= 25)
 
 # ADX forming a bottom while PDI increasing and NDI decreasing
 def checkBottomOnCorrection(df, rowIndex):
@@ -78,6 +80,7 @@ def checkBottomOnCorrection(df, rowIndex):
     return isADXOnBottom and isPDIIncreased and isHistogramIncreased and isAboveMA200 and isStochOverSold and isMACDNegative
 
 # ADX forming a bottom while PDI increasing and NDI decreasing
+
 def checkTopOnCorrection(df, rowIndex):
     row = df.iloc[rowIndex]
     prow = df.iloc[rowIndex + 1]
@@ -160,9 +163,9 @@ def checkStock(stock):
             if checkBottom(df, rowIndex):
                 patterns.append(msgBottom)
             if checkTopOnCorrection(df, rowIndex):
-                patterns.append("Top correction")
+                patterns.append(msgUptrendCorrection)
             if checkBottomOnCorrection(df, rowIndex):
-                patterns.append("Bottom correction")
+                patterns.append(msgDowntrendCorrection)
             if len(patterns) > 0:
                 print(df.iloc[rowIndex].Date, ",".join(patterns))
 

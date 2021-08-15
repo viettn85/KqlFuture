@@ -33,7 +33,7 @@ def draw(stock, timeframe):
     )
     apds = [ fplt.make_addplot(df['MA20'], panel=0,color='red'),
                 fplt.make_addplot(df['MA50'], panel=0,color='blue'),
-                fplt.make_addplot(df['MA200'], panel=0,color='yellow'),
+                fplt.make_addplot(df['MA200'], panel=0,color='green'),
                 fplt.make_addplot(df['Volume'], type = 'line', linestyle=' ', panel =1, mav = 20, color='g'),
                 fplt.make_addplot(df['MACD'], panel=2,color='blue'),
                 fplt.make_addplot(df['MACD_SIGNAL'], panel=2,color='red'),
