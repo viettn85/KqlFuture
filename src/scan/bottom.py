@@ -75,8 +75,8 @@ def checkBottomOnCorrection(df, rowIndex):
     isAboveMA200 = row.Close > row.MA200
     minStoch = round(min(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
     isStochOverSold = minStoch <= 25
-    if isADXOnBottom and isPDIIncreased:
-        print(df.iloc[rowIndex].Date, "ADX Bottom and Increasing")
+    # if isADXOnBottom and isPDIIncreased:
+    #     print(df.iloc[rowIndex].Date, "ADX Bottom and Increasing")
     return isADXOnBottom and isPDIIncreased and isHistogramIncreased and isAboveMA200 and isStochOverSold and isMACDNegative
 
 # ADX forming a bottom while PDI increasing and NDI decreasing
@@ -92,8 +92,8 @@ def checkTopOnCorrection(df, rowIndex):
     isBelowMA200 = row.Close < row.MA200
     maxStoch = round(max(list(df.loc[rowIndex:rowIndex+5]['%D'])), 0)
     isStochOverBought = maxStoch <= 75
-    if isADXOnBottom and isNDIIncreased:
-        print(df.iloc[rowIndex].Date, "ADX Top and Decreasing")
+    # if isADXOnBottom and isNDIIncreased:
+    #     print(df.iloc[rowIndex].Date, "ADX Top and Decreasing")
     return isADXOnBottom and isNDIIncreased and isHistogramDecreased and isBelowMA200 and isStochOverBought and isMACDPossitive
 
 def filterStocks(stocks, rowIndex):
@@ -136,20 +136,25 @@ def scan(stocks, rowIndex):
 
 
 def reportFoundStocks(stocks, rowIndex):
-    (date, bottomOnUptrendStocks, bottomStocks, bottomCorrectionStocks, bottomCorrectionStocksV2) = filterStocks(stocks, rowIndex)
-    message = "<H2>Scanning on {}</H2>".format(date)
+    (date, topStocks, bottomStocks, topCorrectionStocks, bottomCorrectionStocks) = filterStocks(stocks, rowIndex)
+    message = ""
+    if len(topStocks) > 0:
+        message = message + "<h3>{}:</h3>".format(msgTop) + "\n"
+        message = message + ",".join(topStocks)
     if len(bottomStocks) > 0:
         message = message + "<h3>{}</h3>".format(msgBottom) + "\n"
         message = message + ",".join(bottomStocks)
+    if len(topCorrectionStocks) > 0:
+        message = message + "<h3>Top correction:</h3>" + "\n"
+        message = message + ",".join(topCorrectionStocks)
     if len(bottomCorrectionStocks) > 0:
         message = message + "<h3>Bottom correction:</h3>" + "\n"
         message = message + ",".join(bottomCorrectionStocks)
-    if len(bottomCorrectionStocksV2) > 0:
-        message = message + "<h3>Bottom correction V2 (MACD SIGNAL can be above 0):</h3>" + "\n"
-        message = message + ",".join(bottomCorrectionStocksV2)
-    message = message + "\n\n<b>Please check Stoch divergence, trendlines, MA and other resistances<b>\n"
-    message = message + "<b>Exit trade early if you enter for Bottom stocks breaking down MA200<b>"
-    sendEmail("Scan Stock Patterns", message, "html")
+    if message != "":
+        message = "<H2>Scanning on {}</H2>".format(date) + message
+        message = message + "<br><b>Please check Stoch divergence, trendlines, MA and other resistances<b>\n"
+        message = message + "<br><b>Exit trade early if you enter for Bottom stocks breaking down MA200<b>"
+        sendEmail("Scan Stock Patterns", message, "html")
 
 def checkStock(stock):
     df = pd.read_csv("{}{}.csv".format(intraday, stock))

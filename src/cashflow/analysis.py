@@ -24,16 +24,20 @@ tz = os.getenv("timezone")
 date_format = os.getenv("date_format")
 datetime_format = os.getenv("datetime_format")
 date = getLastTradingDay()
-stocks = ['VN30F1M', 'VN30F2M']
+stocks = ['VN30F2108']
 
 def showBigBoys():
     for stock in stocks:
         df = pd.read_csv("{}{}/{}.csv".format(transaction, stock, date))
         df = df[(df.Side == 'B') | (df.Side == 'S')]
-        df = df[df.Volume > 200]
-        if len(df) > 0:
-            print("BigBoys of {}".format(stock))
-            print(df.head(100))
+        df300 = df[df.Volume > 300]
+        if len(df300) > 0:
+            print("BigBoys 300 of {}".format(stock))
+            print(df300.tail(20))
+        df100 = df[df.Volume > 100]
+        if len(df100) > 0:
+            print("BigBoys 100 of {}".format(stock))
+            print(df100.tail(20))
 
 def showCashflowReport():
     for stock in stocks:

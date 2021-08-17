@@ -19,7 +19,7 @@ then
 
 elif [ $1 == 'update' ]
 then
-    python3 src/crawler/intraday.py $2
+    python3 src/crawler/realtime.py
 elif [ $1 == 'scan' ]
 then
     python3 src/scan/ducky.py

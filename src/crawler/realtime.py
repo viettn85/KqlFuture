@@ -69,23 +69,6 @@ def append(stock):
     dfD = df60[dfD.Date != currentDate]
 
 
-
-def updateAll():
-    if isWeekday():
-        currentTime = getCurrentTime()
-        if ((currentTime >= '09:15') and (currentTime <= '11:30')) or ((currentTime >= '13:00') and (currentTime <= '15:05')):
-            (hour, minute) = getHourAndMinute()
-            if (minute >= 0) and (minute <= 2):
-                updatePriceAndVolume('D')
-                updatePriceAndVolume('60')
-                updatePriceAndVolume('15')
-                updatePriceAndVolume('5')
-            elif (minute % 15 <= 1):
-                updatePriceAndVolume('15')
-                updatePriceAndVolume('5')
-            elif minute % 5 <= 1:
-                updatePriceAndVolume('5')
-
 def crawlRecentIntraday():
     logger.info("Get recent intraday data")
     updatePriceAndVolume('D')
@@ -94,10 +77,4 @@ def crawlRecentIntraday():
     updatePriceAndVolume('5')
 
 if __name__ == "__main__":
-    if sys.argv[1] == 'history':
-        crawlRecentIntraday()
-    if sys.argv[1] == 'realtime':
-        schedule.every(30).seconds.do(updateAll)
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
+    crawlRecentIntraday()

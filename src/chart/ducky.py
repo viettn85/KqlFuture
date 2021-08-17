@@ -23,7 +23,7 @@ def draw(stock, timeframe):
     df['Stoch20'] = 20
     df['Stoch80'] = 80
     df['MACD0'] = 0
-    df = df[0:150]
+    df = df[0:100]
     df.sort_index(ascending=True, inplace=True)
     
     
