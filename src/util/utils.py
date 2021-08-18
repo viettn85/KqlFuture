@@ -165,7 +165,9 @@ def getFromDate(resolution):
     if resolution == "15":
         return (now + relativedelta(months=-2)).strftime(date_format)
     if resolution == "5":
-        return (now + relativedelta(months=-2)).strftime(date_format)
+        return (now + relativedelta(months=-1)).strftime(date_format)
+    if resolution == "1":
+        return (now + relativedelta(days=-10)).strftime(date_format)
 
 def getDates():
     if datetime.now().weekday() < 5:

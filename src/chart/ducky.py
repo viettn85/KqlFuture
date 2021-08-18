@@ -73,8 +73,9 @@ from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 # init_notebook_mode()
 
 def exportAll():
-    stocks = ['VN30', 'VN30F1M', 'VN30F2M', "VNINDEX"]
-    timeframes = ['5', '15', '60', 'D']
+    stocks = ['VN30', 'VN30F1M']
+    # stocks = ['VN30', 'VN30F1M', 'VN30F2M', "VNINDEX"]
+    timeframes = ['1', '5', '15', '60', 'D']
     for stock in stocks:
         for timeframe in timeframes:
             draw(stock, timeframe)

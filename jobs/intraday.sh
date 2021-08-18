@@ -1,4 +1,4 @@
 #!/bin/bash
 cd /Users/viet_tran/Workplace/kql/KqlFuture
 echo "Run Intraday Job"
-nohup python3 src/crawler/intraday.py realtime > logs/intraday.log &
+/usr/local/bin/python3 src/app/run.py > logs/intraday.log

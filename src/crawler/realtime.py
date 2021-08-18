@@ -32,7 +32,7 @@ def updatePriceAndVolume(resolution):
     toDate = (datetime.now(timezone(tz)) + relativedelta(days=1)).strftime(date_format)
     startTime = getEpoch(fromDate )
     endTime = getEpoch(toDate)
-    stocks = ['VN30F1M', 'VN30F2M', 'VN30', 'VNINDEX']
+    stocks = ['VN30F1M', 'VN30']
     for stock in stocks: 
         logger.info('Intraday {} for {}'.format(resolution, stock))
         URL = "https://chartdata1.mbs.com.vn/pbRltCharts/chart/history?symbol={}&resolution={}&from={}&to={}".format(stock, resolution, startTime, endTime)
@@ -75,6 +75,7 @@ def crawlRecentIntraday():
     updatePriceAndVolume('60')
     updatePriceAndVolume('15')
     updatePriceAndVolume('5')
+    updatePriceAndVolume('1')
 
 if __name__ == "__main__":
     crawlRecentIntraday()
